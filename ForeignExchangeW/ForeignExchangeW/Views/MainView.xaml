@@ -16,16 +16,50 @@
                 Text="Amount:" >
             </Label>
             <Entry
+                Text="{Binding Amount, Mode=TwoWay}"
                 Placeholder="Enter the amount to convert...">
             </Entry>
             <Label 
                 Text="Source Rate:" >
             </Label>
             <Picker
+                ItemDisplayBinding="{Binding Name}"
+                ItemsSource="{Binding Rates}"
+                SelectedItem="{Binding SourceRate,Mode=TwoWay}"
                 Title="Select a source rate...">
-
             </Picker>
-
+            <Label 
+                Text="Source Target:" >
+            </Label>
+            <Picker
+                ItemDisplayBinding="{Binding Name}"
+                ItemsSource="{Binding Rates, Mode=TwoWay}"
+                SelectedItem="{Binding TargetRate,Mode=TwoWay}"
+                Title="Select a target rate...">
+            </Picker>
+            <ActivityIndicator
+                IsRunning="{Binding IsRunning,Mode=TwoWay}">
+            </ActivityIndicator>
+            <Button
+                Command="{Binding ConvertCommand}"
+                BackgroundColor="Gray"
+                BorderRadius="20"
+                HeightRequest="40"
+                FontAttributes="Bold"
+                IsEnabled="{Binding IsEnabled,Mode=TwoWay}"
+                Text="Convert"
+                TextColor="White">
+            </Button>
+            <Label
+                BackgroundColor="Silver"
+                FontSize="Large"
+                HorizontalTextAlignment="Center"
+                Margin="0,10"
+                Text="{Binding Result,Mode=TwoWay}"
+                VerticalOptions="FillAndExpand"  
+                VerticalTextAlignment="Center">
+                
+            </Label>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
