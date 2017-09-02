@@ -28,6 +28,8 @@ namespace ForeignExchangeW.ViewModels
         bool _IsEnabled;
         string _Results;
         ObservableCollection<Rates> _rates;
+        Rates _sourRate;
+        Rates _targetRates;
 
         #endregion
 
@@ -54,10 +56,43 @@ namespace ForeignExchangeW.ViewModels
             }
         }
 
-        public Rates SourceRate { get; set; }
+        public Rates SourceRate
+        {
+            get
+            {
+                return _sourRate;
 
-        public Rates TargetRate { get; set; }
+            }
+            set
+            {
+                if (_sourRate != value)
+                {
+                    _sourRate = value;
+                    PropertyChanged?.Invoke(
+                        this,
+                        new PropertyChangedEventArgs(nameof(SourceRate)));
+                }
+            }
+        }
 
+        public Rates TargetRate
+        { 
+            get
+            {
+                return _targetRates;
+
+            }
+            set
+            {
+                if (_targetRates != value)
+                {
+                    _targetRates = value;
+                    PropertyChanged?.Invoke(
+                        this,
+                        new PropertyChangedEventArgs(nameof(TargetRate)));
+                }
+            }
+        }
         public bool IsRunning
         {
             get
@@ -174,11 +209,27 @@ namespace ForeignExchangeW.ViewModels
                 amountConverted);
         }
 
-         #endregion
+        public  ICommand SwitchCommand
+        {
+            get
+            {
+                return new RelayCommand(Switch);
+            }
+        }
+
+        void Switch ()
+        {
+            var AUX = SourceRate;
+            SourceRate = TargetRate;
+            TargetRate = AUX;
+            Convert();
+        }
+
+        #endregion
 
         #region Constructors
 
-          public MainViewModel()
+        public MainViewModel()
           {
             LoadRates();
            }
