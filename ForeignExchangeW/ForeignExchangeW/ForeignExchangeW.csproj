@@ -38,9 +38,17 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\Lenguages.cs" />
+    <Compile Include="Helpers\PlatformCulture.cs" />
     <Compile Include="Infraestructure\InstanceLocator.cs" />
+    <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="Models\Rates.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
@@ -88,6 +96,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Resource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Resource_es.resx" />
+    <EmbeddedResource Include="Resources\Resource_fr.resx" />
+    <EmbeddedResource Include="Resources\Resource_pt.resx" />
     <EmbeddedResource Include="Views\MainView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
