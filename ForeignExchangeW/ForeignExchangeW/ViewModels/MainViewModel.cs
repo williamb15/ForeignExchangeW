@@ -12,6 +12,7 @@ namespace ForeignExchangeW.ViewModels
     using Newtonsoft.Json;
     using System.Collections.Generic;
     using Xamarin.Forms;
+    using Helpers; 
 
     public class MainViewModel : INotifyPropertyChanged
     {
@@ -24,14 +25,14 @@ namespace ForeignExchangeW.ViewModels
 
         #region Attributes
 
-        bool _IsRunning;
-        bool _IsEnabled;
-        string _Results;
-        ObservableCollection<Rates> _rates;
-        Rates _sourRate;
-        Rates _targetRates;
+            bool _IsRunning;
+            bool _IsEnabled;
+            string _Results;
+            ObservableCollection<Rates> _rates;
+            Rates _sourRate;
+            Rates _targetRates;
 
-        #endregion
+            #endregion
 
         #region Properties
 
@@ -167,34 +168,34 @@ namespace ForeignExchangeW.ViewModels
             if(string.IsNullOrEmpty(Amount))
             {
                 await Application.Current.MainPage.DisplayAlert(
-                    "Error",
-                    "You must enter a value in amount",
-                    "Accept");
+                    Lenguages.Error,
+                    Lenguages.AmountValidation,
+                    Lenguages.Accept);
                 return;
             }
             decimal amount = 0;
             if(!decimal.TryParse (Amount, out amount))
             {
                 await Application.Current.MainPage.DisplayAlert(
-                    "Error",
-                    "You must enter a numeric value in amount",
-                    "Accept");
+                    Lenguages.Error,
+                    Lenguages.AmountNumericValidation,
+                    Lenguages.Accept);
                 return;
             }
             if (SourceRate == null)
             {
                 await Application.Current.MainPage.DisplayAlert(
-                    "Error",
-                    "You must select a source rate",
-                    "Accept");
+                    Lenguages.Error,
+                    Lenguages.SourceRateValidation,
+                    Lenguages.Accept);
                 return;
             }
             if (TargetRate == null)
             {
                 await Application.Current.MainPage.DisplayAlert(
-                    "Error",
-                    "You must select a target rate",
-                    "Accept");
+                    Lenguages.Error,
+                    Lenguages.TargetRateValidation,
+                    Lenguages.Accept);
                 return;
             }
 
@@ -241,34 +242,7 @@ namespace ForeignExchangeW.ViewModels
         async void LoadRates ()
         {
             IsRunning = true;
-            Result = "Loading Rates..";
-
-            try
-            {
-                var client = new HttpClient();
-                client.BaseAddress = new 
-                    Uri("http://apiexchangerates.azurewebsites.net");
-                var controller = "/api/Rates";
-                var response = await client.GetAsync(controller);
-                var result = await response.Content.ReadAsStringAsync();
-                if(!response.IsSuccessStatusCode)
-                {
-                    IsRunning = false;
-                    Result = result;
-                }
-                var rates = JsonConvert.DeserializeObject<List<Rates>>(result);
-                Rates = new ObservableCollection<Models.Rates>(rates);
-                IsRunning = false;
-                IsEnabled = true;
-                Result = "Ready to convet!";
-            }
-            catch (Exception ex)
-            {
-                IsRunning = false;
-                Result = ex.Message; 
-                throw;
-            }
-
+            Result = Lenguages.Loading;
         }
 
      #endregion
