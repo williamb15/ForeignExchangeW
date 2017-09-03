@@ -12,7 +12,7 @@ namespace ForeignExchangeW.ViewModels
     using Newtonsoft.Json;
     using System.Collections.Generic;
     using Xamarin.Forms;
-    using Helpers; 
+    using Helpers;
 
     public class MainViewModel : INotifyPropertyChanged
     {
@@ -245,7 +245,13 @@ namespace ForeignExchangeW.ViewModels
             Result = Lenguages.Loading;
         }
 
-     #endregion
+        #endregion
+
+        #region Services
+
+        ApiService apiService; 
+
+        #endregion
     }
 
 }
