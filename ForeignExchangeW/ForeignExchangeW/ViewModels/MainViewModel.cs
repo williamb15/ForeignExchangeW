@@ -31,12 +31,35 @@ namespace ForeignExchangeW.ViewModels
             ObservableCollection<Rates> _rates;
             Rates _sourRate;
             Rates _targetRates;
+            string _status;
+            
 
             #endregion
 
         #region Properties
 
         public string Amount { get; set; }
+
+
+        public String Status
+
+        {
+            get
+            {
+                return _status;
+
+            }
+            set
+            {
+                if (_status != value)
+                {
+                    _status = value;
+                    PropertyChanged?.Invoke(
+                        this,
+                        new PropertyChangedEventArgs(nameof(Status)));
+                }
+            }
+        }
 
         public ObservableCollection<Rates> Rates
         {
@@ -232,6 +255,7 @@ namespace ForeignExchangeW.ViewModels
 
         public MainViewModel()
           {
+            apiService = new ApiService();
             LoadRates();
            }
 
@@ -243,13 +267,26 @@ namespace ForeignExchangeW.ViewModels
         {
             IsRunning = true;
             Result = Lenguages.Loading;
+            var response = await apiService.GetList<Rates>(
+                "http://apiexchangerates.azurewebsites.net",
+                "api/Rates");
+            if(!response.IsSuccess)
+            {
+                IsRunning = false;
+                Result = response.Message;
+                return;
+            }
+            Rates = new ObservableCollection<Rates>((List<Rates>)response.Result);
+            IsRunning = false;
+            IsEnabled = true;
+            Result = Lenguages.Ready;
         }
 
         #endregion
 
         #region Services
 
-        ApiService apiService; 
+        ApiService apiService;
 
         #endregion
     }

@@ -1,38 +1,41 @@
 ﻿
-
 namespace ForeignExchangeW
 {
-
+    using ForeignExchangeW.Models;
+    using Newtonsoft.Json;
+    using System;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Threading.Tasks;
     public class ApiService
     {
-        public async Task<Responce> GetList<T>(string urlBase, string controller)
+        public async Task<Response> GetList<T>(string urlBase, string controller)
         {
             try
             {
                 var client = new HttpClient();
-                client.BaseAddress = new
-                    Uri(urlBase);
+                client.BaseAddress = new Uri(urlBase);
                 var response = await client.GetAsync(controller);
                 var result = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
                 {
-                    return new Responce
+                    return new Response
                     {
                         IsSuccess = false,
                         Message = result,
                     };
                 }
-                var List = JsonConvert.DeserializeObject<List<Rates>>(result);
+                var List = JsonConvert.DeserializeObject<List<T>>(result);
+                return new Response
 
-                return new Responce
                 {
                     IsSuccess = true,
-                    result = List,
+                    Result= List,
                 };
             }
             catch (Exception ex)
             {
-                return new Responce
+                return new Response
                 {
                     IsSuccess = false,
                     Message = ex.Message,
