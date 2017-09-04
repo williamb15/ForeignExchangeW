@@ -13,6 +13,8 @@ namespace ForeignExchangeW.ViewModels
     using System.Collections.Generic;
     using Xamarin.Forms;
     using Helpers;
+    using Services;
+    using System.Threading.Tasks;
 
     public class MainViewModel : INotifyPropertyChanged
     {
@@ -32,6 +34,7 @@ namespace ForeignExchangeW.ViewModels
             Rates _sourRate;
             Rates _targetRates;
             string _status;
+            List<Rates> rates;
             
 
             #endregion
@@ -190,35 +193,31 @@ namespace ForeignExchangeW.ViewModels
          {
             if(string.IsNullOrEmpty(Amount))
             {
-                await Application.Current.MainPage.DisplayAlert(
+                await dialogService.ShowMessage(
                     Lenguages.Error,
-                    Lenguages.AmountValidation,
-                    Lenguages.Accept);
+                    Lenguages.AmountValidation);
                 return;
             }
             decimal amount = 0;
             if(!decimal.TryParse (Amount, out amount))
             {
-                await Application.Current.MainPage.DisplayAlert(
+                await dialogService.ShowMessage(
                     Lenguages.Error,
-                    Lenguages.AmountNumericValidation,
-                    Lenguages.Accept);
+                    Lenguages.AmountNumericValidation );
                 return;
             }
             if (SourceRate == null)
             {
-                await Application.Current.MainPage.DisplayAlert(
+                await dialogService.ShowMessage(
                     Lenguages.Error,
-                    Lenguages.SourceRateValidation,
-                    Lenguages.Accept);
+                    Lenguages.SourceRateValidation);
                 return;
             }
             if (TargetRate == null)
             {
-                await Application.Current.MainPage.DisplayAlert(
+                await dialogService.ShowMessage(
                     Lenguages.Error,
-                    Lenguages.TargetRateValidation,
-                    Lenguages.Accept);
+                    Lenguages.TargetRateValidation);
                 return;
             }
 
@@ -256,6 +255,8 @@ namespace ForeignExchangeW.ViewModels
         public MainViewModel()
           {
             apiService = new ApiService();
+            dataService = new DataService();
+            dialogService = new DialogService();
             LoadRates();
            }
 
@@ -267,19 +268,61 @@ namespace ForeignExchangeW.ViewModels
         {
             IsRunning = true;
             Result = Lenguages.Loading;
-            var response = await apiService.GetList<Rates>(
-                "http://apiexchangerates.azurewebsites.net",
-                "api/Rates");
-            if(!response.IsSuccess)
+
+            var connection = await apiService.CheckConnection();
+
+            if(!connection.IsSuccess)
+            {
+                LoadLocalData();
+                Status = "Rates Loades from local data.";
+            }
+            else
+            {
+                await LoadDataFromAPI();
+            }
+
+            if(rates.Count == 0)
             {
                 IsRunning = false;
-                Result = response.Message;
+                IsEnabled = false;
+                Result = "There are not internet connection and  not " +
+                    "load previously rates. Please try again with  " +
+                    "internet connection.";
+                Status = "No rates loaded";
                 return;
             }
-            Rates = new ObservableCollection<Rates>((List<Rates>)response.Result);
+
+            Rates = new ObservableCollection<Rates>(rates);
+
             IsRunning = false;
             IsEnabled = true;
             Result = Lenguages.Ready;
+            Status = "Rates Loades from Internet.";
+        }
+
+        private void LoadLocalData()
+        {
+            rates = dataService.Get<Rates>(false);
+        }
+
+        async Task LoadDataFromAPI()
+        {
+            var url = "http://apiexchangerates.azurewebsites.net"; // Application.Current.Resources["URLAPI"].ToString();
+
+            var response = await apiService.GetList<Rates>(
+                url,
+                "api/Rates");
+
+            if (!response.IsSuccess)
+            {
+                LoadLocalData();
+                return;
+            }
+
+            //storage data local
+            rates = (List<Rates>)response.Result;
+            dataService.DeleteAll<Rates>();
+            dataService.Save(rates);
         }
 
         #endregion
@@ -287,6 +330,9 @@ namespace ForeignExchangeW.ViewModels
         #region Services
 
         ApiService apiService;
+        DialogService dialogService;
+        DataService dataService;
+
 
         #endregion
     }
